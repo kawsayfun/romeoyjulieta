@@ -2,6 +2,15 @@ import { useEffect, useMemo, useRef } from "react";
 import { motion } from "framer-motion";
 import { content } from "../data/content";
 
+// ✅ IMPORTA TUS IMÁGENES (Vite las empaqueta para Netlify)
+import img1 from "../assets/photos/1.jpg";
+import img2 from "../assets/photos/2.jpg";
+import img3 from "../assets/photos/3.jpg";
+import img4 from "../assets/photos/4.jpg";
+import img5 from "../assets/photos/5.jpg";
+// Si tienes 6.jpg, descomenta:
+import img6 from "../assets/photos/6.jpg";
+
 function rand(min, max) {
   return Math.random() * (max - min) + min;
 }
@@ -10,13 +19,9 @@ export default function SpaceJourney({ onLetter }) {
   const canvasRef = useRef(null);
 
   const cards = useMemo(() => {
-    const photos = [
-      "/src/assets/photos/1.jpg",
-      "/src/assets/photos/2.jpg",
-      "/src/assets/photos/3.jpg",
-      "/src/assets/photos/4.jpg",
-      "/src/assets/photos/5.jpg",
-    ];
+    // ✅ ahora son URLs correctas en producción
+    const photos = [img1, img2, img3, img4, img5 /*, img6 */];
+
     const phrases = [
       "Eres mi sueño 🌙",
       "Mi lugar seguro 🫶",
@@ -59,10 +64,14 @@ export default function SpaceJourney({ onLetter }) {
     }));
 
     const images = {};
+
+    // ✅ carga de imagen con manejo de error
     const loadImg = (src) =>
       new Promise((res) => {
         const img = new Image();
+        img.crossOrigin = "anonymous";
         img.onload = () => res(img);
+        img.onerror = () => res(null); // si falla, no rompe
         img.src = src;
       });
 
@@ -119,12 +128,16 @@ export default function SpaceJourney({ onLetter }) {
 
             ctx.save();
             ctx.globalAlpha = Math.min(1, c.z);
+
+            // marco suave
             ctx.fillStyle = "rgba(255,255,255,0.08)";
             ctx.strokeStyle = "rgba(255,255,255,0.18)";
             ctx.lineWidth = 2;
             roundRect(ctx, x - 10, y - 10, iw + 20, ih + 20, 16);
             ctx.fill();
             ctx.stroke();
+
+            // imagen
             ctx.drawImage(img, x, y, iw, ih);
             ctx.restore();
           }
@@ -145,10 +158,16 @@ export default function SpaceJourney({ onLetter }) {
     const init = async () => {
       resize();
 
-      // precarga fotos
-      const uniquePhotos = [...new Set(cards.filter((c) => c.type === "photo").map((c) => c.src))];
+      // precarga fotos únicas
+      const uniquePhotos = [
+        ...new Set(cards.filter((c) => c.type === "photo").map((c) => c.src)),
+      ];
+
       const loaded = await Promise.all(uniquePhotos.map(loadImg));
-      uniquePhotos.forEach((src, i) => (images[src] = loaded[i]));
+
+      uniquePhotos.forEach((src, i) => {
+        if (loaded[i]) images[src] = loaded[i];
+      });
 
       draw();
     };

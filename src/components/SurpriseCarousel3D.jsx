@@ -10,7 +10,7 @@ import img3 from "../assets/photos/3.jpg";
 import img4 from "../assets/photos/4.jpg";
 import img5 from "../assets/photos/5.jpg";
 // Si tienes 6.jpg, descomenta:
-// import img6 from "../assets/photos/6.jpg";
+ import img6 from "../assets/photos/6.jpg";
 
 function ImageRing({ images }) {
   const group = useRef();
