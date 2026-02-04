@@ -1,12 +1,22 @@
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
-import { useMemo, useRef } from "react";
-import * as THREE from "three";
+import { OrbitControls, useTexture } from "@react-three/drei";
+import { Suspense, useRef } from "react";
 import { motion } from "framer-motion";
 
-function ImageRing({ images = [] }) {
+// ✅ IMPORTA las fotos (Vite las empaqueta para Netlify)
+import img1 from "../assets/photos/1.jpg";
+import img2 from "../assets/photos/2.jpg";
+import img3 from "../assets/photos/3.jpg";
+import img4 from "../assets/photos/4.jpg";
+import img5 from "../assets/photos/5.jpg";
+// Si tienes 6.jpg, descomenta:
+// import img6 from "../assets/photos/6.jpg";
+
+function ImageRing({ images }) {
   const group = useRef();
-  const textures = useMemo(() => images.map((src) => new THREE.TextureLoader().load(src)), [images]);
+
+  // ✅ carga segura con drei (maneja mejor Vite/Netlify)
+  const textures = useTexture(images);
 
   useFrame((_, delta) => {
     if (group.current) group.current.rotation.y += delta * 0.35;
@@ -21,10 +31,17 @@ function ImageRing({ images = [] }) {
         const x = Math.cos(angle) * radius;
         const z = Math.sin(angle) * radius;
 
+        // mejora calidad de textura
+        tex.anisotropy = 8;
+
         return (
-          <mesh key={i} position={[x, 0, z]} rotation={[0, -angle + Math.PI, 0]}>
+          <mesh
+            key={i}
+            position={[x, 0, z]}
+            rotation={[0, -angle + Math.PI, 0]}
+          >
             <planeGeometry args={[2.0, 2.8]} />
-            <meshStandardMaterial map={tex} />
+            <meshStandardMaterial map={tex} toneMapped={false} />
           </mesh>
         );
       })}
@@ -32,16 +49,18 @@ function ImageRing({ images = [] }) {
   );
 }
 
+function LoadingFallback() {
+  return (
+    <mesh>
+      <boxGeometry args={[1, 1, 1]} />
+      <meshStandardMaterial />
+    </mesh>
+  );
+}
+
 export default function SurpriseCarousel3D({ onNext }) {
-  // pon tus 5 fotos reales en /src/assets/photos
-  const imgs = [
-    "/src/assets/photos/1.jpg",
-    "/src/assets/photos/2.jpg",
-    "/src/assets/photos/3.jpg",
-    "/src/assets/photos/4.jpg",
-    "/src/assets/photos/5.jpg",
-    "/src/assets/photos/6.jpg",
-  ];
+  // ✅ Usa SOLO las que existan. Si no tienes 6.jpg, NO la pongas.
+  const imgs = [img1, img2, img3, img4, img5 /*, img6 */];
 
   return (
     <section className="min-h-screen bg-gradient-to-b from-black to-[#120018] flex flex-col items-center justify-center px-4">
@@ -57,7 +76,11 @@ export default function SurpriseCarousel3D({ onNext }) {
           <ambientLight intensity={0.6} />
           <directionalLight position={[3, 5, 2]} intensity={1.2} />
           <pointLight position={[-3, -2, -2]} intensity={0.8} />
-          <ImageRing images={imgs} />
+
+          <Suspense fallback={<LoadingFallback />}>
+            <ImageRing images={imgs} />
+          </Suspense>
+
           <OrbitControls enableZoom={false} enablePan={false} />
         </Canvas>
       </div>
