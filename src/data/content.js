@@ -1,0 +1,26 @@
+export const content = {
+  from: "Romeo",
+  to: "Julieta",
+  coverTitle: "Te tengo una sorpresa.",
+  coverSubtitle: "Para descubrirla da click sobre el corazón",
+  basePhrases: [
+    "Te amo con todo mi corazón",
+    "Eres mi lugar favorito",
+    "Contigo todo es mejor",
+    "Mi vida es más bonita contigo",
+    "Eres mi vida",
+    "Siempre tú",
+    "Gracias por existir",
+    "Eres mi paz",
+  ],
+  surpriseButtonText: "Sorpresa ✨",
+  universeTitle: "Nuestro universo",
+  letterButtonText: "Carta para ti 💌",
+  letterTitle: "Para ti, mi amor",
+  letterBody:
+    "Hoy solo quiero recordarte lo mucho que significas para mí...\n\nGracias por estar, por tu risa, por tus abrazos y por hacerme sentir en casa.\n\nFeliz 14 de febrero q falta jaja. Te amo.",
+  footerTop: "Hecho con ❤️ y un poquito de magia",
+  footerSub: "✨",
+  brandText: "Desarrollado por GT Tecnology",
+  brandUrl: "https://www.gttecnology.com",
+};
